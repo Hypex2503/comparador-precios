@@ -1,0 +1,4 @@
+node_modules/
+servidor/tienda.db
+servidor/uploads/*
+!servidor/uploads/.gitkeep

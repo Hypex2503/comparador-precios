@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comparador de Precios</title>
+  <link rel="stylesheet" href="estilos.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Comparador de Precios</h1>
+    <p>Encuentra el mejor precio entre tiendas</p>
+    <input
+      type="text"
+      id="buscador"
+      placeholder="Buscar producto... (ej: mouse)"
+    />
+  </header>
+
+  <main id="contenedor-productos">
+    <!-- Aquí JavaScript va a insertar las tarjetas de productos -->
+  </main>
+
+  <section id="seccion-mapa">
+    <h2>Tiendas cercanas</h2>
+    <button id="boton-ubicacion">Usar mi ubicación</button>
+
+    <div id="config-gasolina">
+      <label>
+        Rendimiento (km/L):
+        <input type="number" id="input-rendimiento" value="12" min="1" step="0.1" />
+      </label>
+      <label>
+        Precio gasolina ($/L):
+        <input type="number" id="input-precio-gasolina" value="24" min="1" step="0.1" />
+      </label>
+      <p id="aviso-aproximado">⚠️ El costo de gasolina es aproximado y puede variar según tráfico, ruta y estilo de manejo.</p>
+    </div>
+
+    <div id="mapa"></div>
+    <div id="lista-distancias"></div>
+
+    <div id="lista-tiendas-admin">
+      <h3>Tiendas registradas</h3>
+      <ul id="lista-tiendas-admin-items"></ul>
+    </div>
+
+    <div id="menu-opciones-contenedor">
+      <button id="boton-menu-opciones">⋮</button>
+      <div id="menu-opciones" class="oculto">
+        <button id="opcion-agregar-tienda">➕ Agregar tienda</button>
+        <button id="opcion-agregar-producto">➕ Agregar producto</button>
+      </div>
+    </div>
+
+    <div id="form-agregar-tienda" class="oculto">
+      <h3>Agregar nueva tienda</h3>
+      <input type="text" id="nueva-tienda-clave" placeholder="Clave corta (ej: TiendaD)" />
+      <input type="text" id="nueva-tienda-nombre" placeholder="Nombre completo (ej: TiendaD - Poniente)" />
+      <input type="text" id="nueva-tienda-direccion" placeholder="Dirección" />
+      <input type="number" id="nueva-tienda-lat" placeholder="Latitud (ej: 20.97)" step="0.0001" />
+      <input type="number" id="nueva-tienda-lng" placeholder="Longitud (ej: -89.62)" step="0.0001" />
+      <button id="boton-agregar-tienda">Agregar tienda</button>
+      <p id="mensaje-agregar-tienda"></p>
+    </div>
+
+    <div id="form-agregar-producto" class="oculto">
+      <h3>Agregar nuevo producto</h3>
+      <input type="text" id="nuevo-producto-nombre" placeholder="Nombre (ej: Frijol)" />
+      <input type="text" id="nuevo-producto-descripcion" placeholder="Descripción (ej: 600 gr)" />
+      <input type="text" id="nuevo-producto-marca" placeholder="Marca (ej: Hellmann's)" />
+      <label>Foto del producto (para verificar):
+        <input type="file" id="nuevo-producto-imagen" accept="image/*" />
+      </label>
+     <div id="precios-por-tienda"></div>
+      <button id="boton-agregar-producto">Agregar producto</button>
+      <p id="mensaje-agregar-producto"></p>
+    </div>
+  </section>
+<script src="config.js"></script>
+  <script src="tiendas.js"></script>
+  <script src="app.js"></script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="mapa.js"></script>
+</body>
+</html>

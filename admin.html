@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de administrador</title>
+  <script src="config.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background-color: #f4f4f4; padding: 30px; }
+    h1 { color: #2c3e50; margin-bottom: 20px; }
+    #pantalla-login { max-width: 300px; margin: 100px auto; text-align: center; }
+    #pantalla-login input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc; }
+    #pantalla-login button { width: 100%; padding: 10px; background-color: #2c3e50; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .oculto { display: none !important; }
+    .tarjeta { background: white; border-radius: 8px; padding: 15px 20px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+    .tarjeta .info { flex: 1; }
+    .tarjeta .acciones button { margin-left: 8px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; }
+    .boton-aprobar { background-color: #27ae60; color: white; }
+    .boton-rechazar { background-color: #c0392b; color: white; }
+    #mensaje-login { color: #c0392b; margin-top: 10px; }
+    section { margin-bottom: 30px; }
+  </style>
+</head>
+<body>
+
+  <div id="pantalla-login">
+    <h1>Panel de administrador</h1>
+    <input type="password" id="input-contrasena" placeholder="Contraseña" />
+    <button id="boton-entrar">Entrar</button>
+    <p id="mensaje-login"></p>
+  </div>
+
+  <div id="panel-admin" class="oculto">
+    <h1>Panel de administrador</h1>
+
+    <section>
+      <h2>Tiendas pendientes</h2>
+      <div id="lista-tiendas-pendientes"></div>
+    </section>
+
+    <section>
+      <h2>Productos pendientes</h2>
+      <div id="lista-productos-pendientes"></div>
+    </section>
+
+    <section>
+      <h2>Solicitudes de borrado</h2>
+      <div id="lista-solicitudes-borrado"></div>
+    </section>
+  </div>
+
+  <script>
+    let contrasenaGuardada = "";
+
+    document.getElementById("boton-entrar").addEventListener("click", async () => {
+      contrasenaGuardada = document.getElementById("input-contrasena").value;
+      const exito = await cargarPendientes();
+      if (exito) {
+        document.getElementById("pantalla-login").classList.add("oculto");
+        document.getElementById("panel-admin").classList.remove("oculto");
+      } else {
+        document.getElementById("mensaje-login").textContent = "Contraseña incorrecta.";
+      }
+    });
+
+    async function cargarPendientes() {
+      const respuesta = await fetch(`${URL_SERVIDOR}/api/admin/pendientes`, {
+        headers: { "x-admin-password": contrasenaGuardada }
+      });
+
+      if (!respuesta.ok) return false;
+
+      const datos = await respuesta.json();
+      renderizarTiendas(datos.tiendas);
+      renderizarProductos(datos.productos);
+      await cargarSolicitudesBorrado();
+      return true;
+    }
+
+    async function cargarSolicitudesBorrado() {
+      const respuesta = await fetch(`${URL_SERVIDOR}/api/admin/solicitudes-borrado`, {
+        headers: { "x-admin-password": contrasenaGuardada }
+      });
+
+      if (!respuesta.ok) return;
+
+      const solicitudes = await respuesta.json();
+      const contenedor = document.getElementById("lista-solicitudes-borrado");
+
+      if (solicitudes.length === 0) {
+        contenedor.innerHTML = "<p>No hay solicitudes de borrado.</p>";
+        return;
+      }
+
+      contenedor.innerHTML = solicitudes
+        .map(
+          (solicitud) => `
+            <div class="tarjeta">
+              <div class="info">
+                <strong>${solicitud.nombre}</strong><br>
+                <small>Tipo: ${solicitud.tipo}</small>
+              </div>
+              <div class="acciones">
+                <button class="boton-aprobar" data-solicitud-id="${solicitud.id}" data-accion="aprobar-borrado">✅ Aprobar borrado</button>
+                <button class="boton-rechazar" data-solicitud-id="${solicitud.id}" data-accion="rechazar-borrado">❌ Rechazar</button>
+              </div>
+            </div>
+          `
+        )
+        .join("");
+    }
+
+    function renderizarTiendas(tiendas) {
+      const contenedor = document.getElementById("lista-tiendas-pendientes");
+
+      if (tiendas.length === 0) {
+        contenedor.innerHTML = "<p>No hay tiendas pendientes.</p>";
+        return;
+      }
+
+      contenedor.innerHTML = tiendas
+        .map(
+          (tienda) => `
+            <div class="tarjeta">
+              <div class="info">
+                <strong>${tienda.nombre}</strong><br>
+                <small>${tienda.direccion}</small>
+              </div>
+              <div class="acciones">
+                <button class="boton-aprobar" data-clave="${tienda.clave}" data-tipo="tienda">✅ Aprobar</button>
+                <button class="boton-rechazar" data-clave="${tienda.clave}" data-tipo="tienda">❌ Rechazar</button>
+              </div>
+            </div>
+          `
+        )
+        .join("");
+    }
+
+    function renderizarProductos(productos) {
+      const contenedor = document.getElementById("lista-productos-pendientes");
+
+      if (productos.length === 0) {
+        contenedor.innerHTML = "<p>No hay productos pendientes.</p>";
+        return;
+      }
+
+      contenedor.innerHTML = productos
+        .map((producto) => {
+          const precios = producto.tiendas.map((t) => `${t.nombre}: $${t.precio}`).join(" · ");
+          const imagenHtml = producto.imagen
+            ? `<img src="${producto.imagen}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;margin-right:12px;">`
+            : "";
+          return `
+            <div class="tarjeta">
+              ${imagenHtml}
+              <div class="info">
+                <strong>${producto.nombre}</strong> ${producto.marca ? `— ${producto.marca}` : ""}<br>
+                <small>${producto.descripcion || ""}</small><br>
+                <small>${precios}</small>
+              </div>
+              <div class="acciones">
+                <button class="boton-aprobar" data-id="${producto.id}" data-tipo="producto">✅ Aprobar</button>
+                <button class="boton-rechazar" data-id="${producto.id}" data-tipo="producto">❌ Rechazar</button>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    document.getElementById("panel-admin").addEventListener("click", async (evento) => {
+      const boton = evento.target;
+      const accion = boton.dataset.accion;
+
+      if (accion === "aprobar-borrado" || accion === "rechazar-borrado") {
+        const idSolicitud = boton.dataset.solicitudId;
+        const url = `${URL_SERVIDOR}/api/admin/solicitudes-borrado/${idSolicitud}${accion === "aprobar-borrado" ? "/aprobar" : ""}`;
+
+        await fetch(url, {
+          method: accion === "aprobar-borrado" ? "PATCH" : "DELETE",
+          headers: { "x-admin-password": contrasenaGuardada }
+        });
+
+        cargarPendientes();
+        return;
+      }
+
+      const tipo = boton.dataset.tipo;
+      if (!tipo) return;
+
+      const esAprobar = boton.classList.contains("boton-aprobar");
+
+      if (tipo === "tienda") {
+        const clave = boton.dataset.clave;
+        const url = `${URL_SERVIDOR}/api/admin/tiendas/${clave}/aprobar`;
+        if (esAprobar) {
+          await fetch(url, {
+            method: "PATCH",
+            headers: { "x-admin-password": contrasenaGuardada }
+          });
+        }
+      } else {
+        const id = boton.dataset.id;
+        const url = `${URL_SERVIDOR}/api/admin/productos/${id}/aprobar`;
+        if (esAprobar) {
+          await fetch(url, {
+            method: "PATCH",
+            headers: { "x-admin-password": contrasenaGuardada }
+          });
+        }
+      }
+
+      cargarPendientes();
+    });
+  </script>
+</body>
+</html>
