@@ -226,6 +226,7 @@ document.getElementById("opcion-agregar-tienda").addEventListener("click", () =>
   formAgregarTienda.classList.remove("oculto");
   formAgregarProducto.classList.add("oculto");
   menuOpciones.classList.add("oculto");
+  formAgregarTienda.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 // Genera un campo de precio por cada tienda registrada
@@ -254,6 +255,7 @@ document.getElementById("opcion-agregar-producto").addEventListener("click", () 
   formAgregarProducto.classList.remove("oculto");
   formAgregarTienda.classList.add("oculto");
   menuOpciones.classList.add("oculto");
+  formAgregarProducto.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 // Conecta el formulario de "Agregar tienda" con el servidor
