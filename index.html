@@ -10,14 +10,21 @@
 <body>
 
   <header>
-    <h1>Comparador de Precios</h1>
-    <p>Encuentra el mejor precio entre tiendas</p>
-    <input
-      type="text"
-      id="buscador"
-      placeholder="Buscar producto... (ej: mouse)"
-    />
-  </header>
+  <div id="menu-opciones-contenedor">
+    <button id="boton-menu-opciones">⋮</button>
+    <div id="menu-opciones" class="oculto">
+      <button id="opcion-agregar-tienda">➕ Agregar tienda</button>
+      <button id="opcion-agregar-producto">➕ Agregar producto</button>
+    </div>
+  </div>
+  <h1>Comparador de Precios</h1>
+  <p>Encuentra el mejor precio entre tiendas</p>
+  <input
+    type="text"
+    id="buscador"
+    placeholder="Buscar producto... (ej: mouse)"
+  />
+</header>
 
   <main id="contenedor-productos">
     <!-- Aquí JavaScript va a insertar las tarjetas de productos -->
@@ -47,14 +54,7 @@
       <ul id="lista-tiendas-admin-items"></ul>
     </div>
 
-    <div id="menu-opciones-contenedor">
-      <button id="boton-menu-opciones">⋮</button>
-      <div id="menu-opciones" class="oculto">
-        <button id="opcion-agregar-tienda">➕ Agregar tienda</button>
-        <button id="opcion-agregar-producto">➕ Agregar producto</button>
-      </div>
-    </div>
-
+   
     <div id="form-agregar-tienda" class="oculto">
       <h3>Agregar nueva tienda</h3>
       <input type="text" id="nueva-tienda-clave" placeholder="Clave corta (ej: TiendaD)" />

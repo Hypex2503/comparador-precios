@@ -58,10 +58,21 @@ function crearTarjetaProducto(producto) {
     })
     .join("");
 
+  const imagenHtml = producto.imagen
+    ? `<img src="${producto.imagen}" class="imagen-producto" alt="${producto.nombre}">`
+    : "";
+
+  const marcaHtml = producto.marca ? `<span class="marca-producto">${producto.marca}</span>` : "";
+  const descripcionHtml = producto.descripcion
+    ? `<p class="descripcion-producto">${producto.descripcion}</p>`
+    : "";
+
   return `
     <div class="tarjeta-producto">
       <button class="boton-borrar-producto" data-id="${producto.id}" title="Solicitar borrado">🗑</button>
-      <h2>${producto.nombre}</h2>
+      ${imagenHtml}
+      <h2>${producto.nombre} ${marcaHtml}</h2>
+      ${descripcionHtml}
       <ul class="lista-tiendas">
         ${itemsTiendas}
       </ul>
